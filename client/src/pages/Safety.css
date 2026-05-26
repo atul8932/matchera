@@ -1,0 +1,116 @@
+/* ── SAFETY PAGE ─────────────────────────────────────────────────────────── */
+.safety-page { padding-bottom: 60px; }
+
+.safety-header { margin: 32px 0 24px; }
+.safety-header h2 { margin-bottom: 4px; }
+
+/* SOS banner */
+.sos-banner {
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border: 1px solid rgba(239,68,68,0.3);
+  background: rgba(239,68,68,0.05);
+  margin-bottom: 28px;
+}
+.sos-info { display: flex; align-items: center; gap: 16px; flex: 1; }
+.sos-icon { font-size: 2.5rem; }
+.sos-info h3 { margin-bottom: 4px; }
+.sos-info p { font-size: 0.88rem; color: var(--text-secondary); }
+
+.sos-btn {
+  padding: 14px 28px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--transition);
+  letter-spacing: 0.05em;
+  animation: none;
+}
+.sos-btn:hover { background: #dc2626; transform: scale(1.05); }
+.sos-btn.active { animation: pulse 0.5s infinite; background: #dc2626; }
+
+/* Tabs */
+.safety-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0;
+}
+.safety-tab {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--transition);
+  margin-bottom: -1px;
+}
+.safety-tab:hover { color: var(--text-primary); }
+.safety-tab.active { color: var(--primary-light); border-bottom-color: var(--primary); }
+
+/* Overview */
+.safety-overview { display: flex; flex-direction: column; gap: 20px; }
+
+.checkin-card {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border: 1px solid rgba(16,185,129,0.3);
+  background: rgba(16,185,129,0.04);
+}
+.checkin-info { display: flex; align-items: center; gap: 16px; }
+.checkin-info h3 { margin-bottom: 4px; }
+.checkin-info p { font-size: 0.88rem; color: var(--text-secondary); }
+
+.safety-tips-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.safety-tip-card { padding: 20px; }
+.safety-tip-icon { font-size: 2rem; margin-bottom: 10px; }
+.safety-tip-card h4 { font-size: 0.95rem; margin-bottom: 6px; }
+.safety-tip-card p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; }
+
+/* Star picker */
+.star-picker { display: flex; align-items: center; gap: 4px; }
+.star-btn {
+  font-size: 1.8rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 2px;
+  line-height: 1;
+}
+.star-btn.filled { color: var(--accent); }
+.star-btn:hover { transform: scale(1.2); }
+.star-picker span { margin-left: 8px; color: var(--text-secondary); font-weight: 600; }
+
+@media (max-width: 768px) {
+  .safety-tips-grid { grid-template-columns: 1fr 1fr; }
+  .sos-banner { flex-direction: column; text-align: center; }
+}
+@media (max-width: 480px) {
+  .safety-tips-grid { grid-template-columns: 1fr; }
+}
+
+/* Contacts section */
+.contacts-section { display: flex; flex-direction: column; gap: 20px; }
+
