@@ -58,8 +58,8 @@
   transition: var(--transition);
   margin-bottom: -1px;
 }
-.safety-tab:hover { color: var(--text-primary); }
-.safety-tab.active { color: var(--primary-light); border-bottom-color: var(--primary); }
+.safety-tab:hover { color: var(--text-primary); background: var(--bg-secondary); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+.safety-tab.active { color: var(--primary); font-weight: 700; border-bottom-color: var(--primary); }
 
 /* Overview */
 .safety-overview { display: flex; flex-direction: column; gap: 20px; }

@@ -19,6 +19,19 @@ const COMPANION_TABS = [
   { key: "events", icon: "🎉", label: "Events / Outings", desc: "Concerts & social fun", color: "#0284C7", bg: "#E0F2FE" },
 ];
 
+// ── localStorage helpers for seen IDs ──────────────────────────────────────
+const LS_KEY = "matchera_seen_ids";
+const loadSeenIds = () => {
+  try { return new Set(JSON.parse(localStorage.getItem(LS_KEY) || "[]")); }
+  catch { return new Set(); }
+};
+const saveSeenIds = (set) => {
+  try { localStorage.setItem(LS_KEY, JSON.stringify([...set])); } catch {}
+};
+const clearSeenIds = () => {
+  try { localStorage.removeItem(LS_KEY); } catch {}
+};
+
 export default function Explore() {
   const toast = useToast();
   const navigate = useNavigate();
@@ -30,8 +43,8 @@ export default function Explore() {
   const [showFilters, setShowFilters] = useState(false);
   const [matchModal, setMatchModal] = useState(null);
   const [swipeDir, setSwipeDir] = useState(null);
-  // Track IDs that have been liked/passed to prevent re-showing
-  const seenIds = useRef(new Set());
+  // Persist seen IDs across refreshes via localStorage
+  const seenIds = useRef(loadSeenIds());
 
   const fetchUsers = async (intentOverride) => {
     setLoading(true);
@@ -59,7 +72,8 @@ export default function Explore() {
     const newKey = activeTab === key ? "" : key;
     setActiveTab(newKey);
     setFilters(prev => ({ ...prev, intent: newKey }));
-    seenIds.current = new Set(); // reset seen on filter change
+    clearSeenIds();
+    seenIds.current = new Set();
     fetchUsers(newKey);
   };
 
@@ -68,7 +82,8 @@ export default function Explore() {
     if (!user) return;
     setSwipeDir("right");
     setTimeout(async () => {
-      seenIds.current.add(user._id); // mark as seen
+      seenIds.current.add(user._id);
+      saveSeenIds(seenIds.current); // persist to localStorage
       try {
         const res = await api.post(`/users/${user._id}/like`);
         if (res.data.isMatch) {
@@ -87,7 +102,8 @@ export default function Explore() {
     if (!user) return;
     setSwipeDir("left");
     setTimeout(async () => {
-      seenIds.current.add(user._id); // mark as seen
+      seenIds.current.add(user._id);
+      saveSeenIds(seenIds.current); // persist to localStorage
       try { await api.post(`/users/${user._id}/pass`); } catch {}
       setCurrentIdx((i) => i + 1);
       setSwipeDir(null);
@@ -175,7 +191,7 @@ export default function Explore() {
                 <input className="input" placeholder="e.g. Mumbai" value={filters.city} onChange={(e) => setFilters({ ...filters, city: e.target.value })} />
               </div>
             </div>
-            <button className="btn btn-primary btn-sm" onClick={() => { seenIds.current = new Set(); fetchUsers(); }}>Apply Filters</button>
+            <button className="btn btn-primary btn-sm" onClick={() => { clearSeenIds(); seenIds.current = new Set(); fetchUsers(); }}>Apply Filters</button>
           </div>
         )}
 
@@ -190,7 +206,7 @@ export default function Explore() {
               <div className="no-more-icon">🌟</div>
               <h3>You've seen everyone!</h3>
               <p>Try changing your filters or check back later for new profiles.</p>
-              <button className="btn btn-primary" onClick={() => { seenIds.current = new Set(); fetchUsers(); }}>
+              <button className="btn btn-primary" onClick={() => { clearSeenIds(); seenIds.current = new Set(); fetchUsers(); }}>
                 🔄 Refresh Profiles
               </button>
             </div>

@@ -55,11 +55,12 @@
   cursor: pointer;
   transition: var(--transition);
 }
-.filter-pill:hover { border-color: var(--primary); color: var(--primary); }
+.filter-pill:hover { border-color: var(--primary); color: var(--primary); background: #EFF6FF; }
 .filter-pill.active {
-  background: rgba(37,99,235,0.15);
+  background: var(--primary);
   border-color: var(--primary);
-  color: var(--primary-light);
+  color: #FFFFFF;
+  font-weight: 600;
 }
 
 /* Grid */

@@ -6,7 +6,7 @@ import { generateAvatarUrl } from "../utils/constants";
 import "./Admin.css";
 
 export default function Admin() {
-  const { user } = useAuth();
+  const { user, login } = useAuth();
   const toast = useToast();
   const [tab, setTab] = useState("overview");
   const [stats, setStats] = useState(null);
@@ -14,6 +14,11 @@ export default function Admin() {
   const [reports, setReports] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+
+  // Passkey gate state
+  const [passkey, setPasskey] = useState("");
+  const [passkeyLoading, setPasskeyLoading] = useState(false);
+  const [showKey, setShowKey] = useState(false);
 
   useEffect(() => {
     if (user?.role !== "admin") return;
@@ -75,13 +80,69 @@ export default function Admin() {
     } catch { toast.error("Action failed"); }
   };
 
+  // ── Submit passkey to unlock admin ─────────────────────────────────────
+  const handlePasskey = async (e) => {
+    e.preventDefault();
+    if (!passkey.trim()) { toast.error("Enter the admin passkey"); return; }
+    setPasskeyLoading(true);
+    try {
+      const res = await api.post("/auth/admin-passkey", { passkey });
+      login(res.data.user, res.data.token); // refresh auth context with admin role
+      toast.success("Admin access granted! 🔓");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Invalid passkey");
+    } finally {
+      setPasskeyLoading(false);
+      setPasskey("");
+    }
+  };
+
+  // ── Gate: show passkey form if not admin ───────────────────────────────
   if (user?.role !== "admin") {
     return (
-      <div className="page" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div className="card" style={{ padding: 40, textAlign: "center" }}>
-          <p style={{ fontSize: "3rem" }}>🔒</p>
-          <h3 style={{ marginTop: 16 }}>Admin Access Required</h3>
-          <p style={{ color: "var(--text-secondary)" }}>You don't have permission to view this page.</p>
+      <div className="page" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "70vh" }}>
+        <div className="card animate-scale-in" style={{ padding: "44px 36px", maxWidth: 420, width: "100%", textAlign: "center" }}>
+          <p style={{ fontSize: "3.5rem", marginBottom: 8 }}>🔐</p>
+          <h3 style={{ marginBottom: 6, fontSize: "1.3rem" }}>Admin Access Required</h3>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: 28 }}>
+            Enter the secret passkey to unlock the control panel.
+          </p>
+
+          <form onSubmit={handlePasskey} style={{ display: "flex", flexDirection: "column", gap: 14, textAlign: "left" }}>
+            <div className="input-group">
+              <label className="input-label">Admin Passkey</label>
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showKey ? "text" : "password"}
+                  className="input"
+                  placeholder="Enter secret passkey..."
+                  value={passkey}
+                  onChange={(e) => setPasskey(e.target.value)}
+                  autoComplete="off"
+                  style={{ paddingRight: 48 }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowKey(!showKey)}
+                  style={{
+                    position: "absolute", right: 12, top: "50%",
+                    transform: "translateY(-50%)", background: "none",
+                    border: "none", cursor: "pointer", fontSize: "1.1rem",
+                    color: "var(--text-muted)", padding: 0
+                  }}
+                >
+                  {showKey ? "🙈" : "👁️"}
+                </button>
+              </div>
+            </div>
+            <button type="submit" className="btn btn-primary" style={{ width: "100%" }} disabled={passkeyLoading}>
+              {passkeyLoading ? <span className="spinner" /> : "🔓 Unlock Admin Panel"}
+            </button>
+          </form>
+
+          <p style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginTop: 20 }}>
+            Set <code style={{ background: "var(--bg-elevated)", padding: "1px 5px", borderRadius: 4 }}>ADMIN_PASSKEY</code> in your Render environment variables.
+          </p>
         </div>
       </div>
     );

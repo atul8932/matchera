@@ -142,5 +142,37 @@ router.put("/update-profile", verifyToken, async (req, res) => {
   }
 });
 
+// POST /api/auth/admin-passkey
+// Validates the secret passkey and elevates the logged-in user to admin role
+router.post("/admin-passkey", verifyToken, async (req, res) => {
+  try {
+    const { passkey } = req.body;
+    const ADMIN_PASSKEY = process.env.ADMIN_PASSKEY;
+
+    if (!ADMIN_PASSKEY) {
+      return res.status(503).json({ message: "Admin access not configured on this server." });
+    }
+    if (!passkey || passkey !== ADMIN_PASSKEY) {
+      return res.status(401).json({ message: "Invalid passkey. Access denied." });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      { role: "admin" },
+      { new: true }
+    ).select("-password");
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Issue a fresh token with admin role embedded
+    const token = jwt.sign({ id: user._id, role: "admin" }, JWT_SECRET, { expiresIn: "30d" });
+
+    res.json({ user, token, message: "Admin access granted ✓" });
+  } catch (err) {
+    console.error("Admin passkey error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;
 module.exports.verifyToken = verifyToken;
