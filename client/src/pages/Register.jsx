@@ -216,10 +216,9 @@ export default function Register() {
                     ))}
                   </div>
                 </div>
-              </div>
 
-                {/* T&C on final step */}
-                <label className="auth-tnc-row" style={{ marginTop: 8 }}>
+                {/* T&C checkbox */}
+                <label className="auth-tnc-row" style={{ marginTop: 16 }}>
                   <input
                     type="checkbox"
                     checked={agreed}
@@ -228,11 +227,12 @@ export default function Register() {
                   />
                   <span style={{ fontSize: "0.82rem", color: "var(--text-secondary)" }}>
                     I agree to Matchera's{" "}
-                    <a href="/terms" target="_blank" style={{ color: "var(--primary)", fontWeight: 600 }}>Terms of Service</a>
+                    <a href="/terms" target="_blank" rel="noreferrer" style={{ color: "var(--primary)", fontWeight: 600 }}>Terms of Service</a>
                     {" "}and{" "}
-                    <a href="/privacy" target="_blank" style={{ color: "var(--primary)", fontWeight: 600 }}>Privacy Policy</a>
+                    <a href="/privacy" target="_blank" rel="noreferrer" style={{ color: "var(--primary)", fontWeight: 600 }}>Privacy Policy</a>
                   </span>
                 </label>
+              </div>
             )}
 
             <div className="form-actions">
