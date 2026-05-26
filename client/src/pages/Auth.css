@@ -196,3 +196,49 @@
 
 /* Form actions */
 .form-actions { display: flex; gap: 12px; margin-top: 24px; }
+
+/* ── T&C CHECKBOX ──────────────────────────────────────────────────────────── */
+.auth-tnc-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding: 2px 0;
+}
+.auth-tnc-checkbox {
+  width: 17px;
+  height: 17px;
+  min-width: 17px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  margin-top: 2px;
+  border-radius: 4px;
+}
+.auth-tnc-link {
+  color: var(--primary) !important;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* ── FIX: Selected button text must always be visible ───────────────────── */
+.intent-pick-btn.selected {
+  border-color: var(--color) !important;
+  color: var(--color) !important;
+  background: var(--bg) !important;
+  font-weight: 600;
+}
+.mood-btn.selected {
+  border-color: var(--primary) !important;
+  color: #1D4ED8 !important;
+  background: #DBEAFE !important;
+  font-weight: 600;
+}
+.tag.active {
+  background: #DBEAFE !important;
+  border-color: var(--primary) !important;
+  color: #1D4ED8 !important;
+  font-weight: 600;
+}

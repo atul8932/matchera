@@ -69,7 +69,12 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Profile dropdown */}
+        {/* Mobile hamburger - left of profile on mobile */}
+        <button className="hamburger hide-desktop" onClick={() => setMenuOpen(!menuOpen)}>
+          {menuOpen ? "✕" : "☰"}
+        </button>
+
+        {/* Profile dropdown - always rightmost */}
         <div className="navbar-profile" onClick={() => setProfileOpen(!profileOpen)}>
           <img
             src={user.profilePhoto || generateAvatarUrl(user.name)}
@@ -114,11 +119,6 @@ export default function Navbar() {
             </div>
           )}
         </div>
-
-        {/* Mobile hamburger */}
-        <button className="hamburger hide-desktop" onClick={() => setMenuOpen(!menuOpen)}>
-          {menuOpen ? "✕" : "☰"}
-        </button>
       </div>
 
       {/* Mobile menu */}

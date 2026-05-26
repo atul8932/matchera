@@ -11,13 +11,12 @@ export default function Login() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.email || !form.password) {
-      toast.error("Please fill in all fields");
-      return;
-    }
+    if (!form.email || !form.password) { toast.error("Please fill in all fields"); return; }
+    if (!agreed) { toast.error("Please accept the Terms & Privacy Policy to continue"); return; }
     setLoading(true);
     try {
       const res = await api.post("/auth/login", form);
@@ -40,7 +39,7 @@ export default function Login() {
       <div className="auth-container animate-scale-in">
         <Link to="/" className="auth-logo">
           <span>💫</span>
-          <img src="/matchera-logo.png" alt="Matchera" style={{ height: 40 }} />
+          <img src="/matchera-logo.jpeg" alt="Matchera" style={{ height: 40 }} />
         </Link>
 
         <div className="auth-card glass">
@@ -80,18 +79,38 @@ export default function Login() {
               </div>
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ width: "100%" }} disabled={loading}>
+            {/* Terms & Conditions checkbox */}
+            <label className="auth-tnc-row">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                className="auth-tnc-checkbox"
+              />
+              <span>
+                I agree to Matchera's{" "}
+                <Link to="/terms" target="_blank" className="auth-tnc-link">Terms of Service</Link>
+                {" "}and{" "}
+                <Link to="/privacy" target="_blank" className="auth-tnc-link">Privacy Policy</Link>
+              </span>
+            </label>
+
+            <button
+              type="submit"
+              className="btn btn-primary"
+              style={{ width: "100%" }}
+              disabled={loading || !agreed}
+            >
               {loading ? <span className="spinner" /> : "Sign In →"}
             </button>
           </form>
 
           <div className="divider">or</div>
 
-          {/* Demo login */}
           <button
             className="btn btn-outline"
             style={{ width: "100%" }}
-            onClick={() => setForm({ email: "demo@companion.app", password: "demo123" })}
+            onClick={() => { setForm({ email: "demo@companion.app", password: "demo123" }); setAgreed(true); }}
           >
             🎭 Fill Demo Credentials
           </button>

@@ -190,7 +190,7 @@ export default function Matches() {
                   <div className="mc-actions">
                     <button
                       className="btn btn-primary btn-sm mc-chat-btn"
-                      onClick={() => navigate("/chat")}
+                      onClick={() => navigate("/chat", { state: { matchId: match._id, userId: other._id, userName: other.name } })}
                     >
                       💬 Message
                     </button>

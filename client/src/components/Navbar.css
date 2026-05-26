@@ -20,8 +20,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 16px;
 }
+
+/* On mobile: logo | [desktop nav hidden] | hamburger | profile */
+@media (max-width: 768px) {
+  .navbar-inner {
+    padding: 0 16px;
+    gap: 8px;
+  }
+  /* push hamburger + profile to the right */
+  .navbar-links { display: none !important; }
+  .hamburger { order: 2; }
+  .navbar-profile { order: 3; margin-left: 0; }
+}
+
 
 .navbar-logo {
   display: flex;

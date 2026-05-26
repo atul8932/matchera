@@ -19,6 +19,7 @@ export default function Register() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const [form, setForm] = useState({
     name: "", email: "", password: "", confirmPassword: "",
     age: "", gender: "", bio: "", location: "",
@@ -55,9 +56,14 @@ export default function Register() {
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
   };
 
+  const toggleMood = (key) => {
+    setForm((p) => ({ ...p, mood: p.mood === key ? "" : key }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (form.intents.length === 0) { toast.error("Select at least one intent"); return; }
+    if (!agreed) { toast.error("Please accept the Terms & Privacy Policy to continue"); return; }
     setLoading(true);
     try {
       const payload = { ...form };
@@ -186,7 +192,7 @@ export default function Register() {
                         key={key}
                         type="button"
                         className={`mood-btn ${form.mood === key ? "selected" : ""}`}
-                        onClick={() => update("mood", key)}
+                        onClick={() => toggleMood(key)}
                       >
                         <span>{cfg.icon}</span>
                         <span>{cfg.label}</span>
@@ -211,6 +217,22 @@ export default function Register() {
                   </div>
                 </div>
               </div>
+
+                {/* T&C on final step */}
+                <label className="auth-tnc-row" style={{ marginTop: 8 }}>
+                  <input
+                    type="checkbox"
+                    checked={agreed}
+                    onChange={(e) => setAgreed(e.target.checked)}
+                    className="auth-tnc-checkbox"
+                  />
+                  <span style={{ fontSize: "0.82rem", color: "var(--text-secondary)" }}>
+                    I agree to Matchera's{" "}
+                    <a href="/terms" target="_blank" style={{ color: "var(--primary)", fontWeight: 600 }}>Terms of Service</a>
+                    {" "}and{" "}
+                    <a href="/privacy" target="_blank" style={{ color: "var(--primary)", fontWeight: 600 }}>Privacy Policy</a>
+                  </span>
+                </label>
             )}
 
             <div className="form-actions">
@@ -223,7 +245,7 @@ export default function Register() {
                 type="submit"
                 className="btn btn-primary"
                 style={{ flex: 1 }}
-                disabled={loading}
+                disabled={loading || (step === 2 && !agreed)}
               >
                 {loading ? <span className="spinner" /> : step < 2 ? "Continue →" : "🚀 Create Account"}
               </button>

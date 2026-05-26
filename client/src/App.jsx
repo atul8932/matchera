@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
 
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -78,6 +79,7 @@ function AppRoutes() {
         <Route path="/dashboard" element={<Navigate to="/explore" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Footer />
     </>
   );
 }
