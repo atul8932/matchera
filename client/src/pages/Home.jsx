@@ -329,32 +329,32 @@ export default function Home() {
             </div>
             <div className="h-footer-col">
               <h5>Platform</h5>
-              <a href="#">Explore</a>
-              <a href="#">Sessions</a>
-              <a href="#">Matches</a>
-              <a href="#">Safety</a>
+              <Link to="/explore">Explore</Link>
+              <Link to="/sessions">Sessions</Link>
+              <Link to="/matches">Matches</Link>
+              <Link to="/safety">Safety</Link>
             </div>
             <div className="h-footer-col">
               <h5>Company</h5>
-              <a href="#">About Us</a>
-              <a href="#">Blog</a>
-              <a href="#">Careers</a>
-              <a href="#">Press</a>
+              <Link to="/about">About Us</Link>
+              <Link to="/blog">Blog</Link>
+              <Link to="/careers">Careers</Link>
+              <Link to="/press">Press</Link>
             </div>
             <div className="h-footer-col">
               <h5>Legal</h5>
-              <a href="#">Privacy Policy</a>
-              <a href="#">Terms of Service</a>
-              <a href="#">Safety Guidelines</a>
-              <a href="#">Contact</a>
+              <Link to="/privacy">Privacy Policy</Link>
+              <Link to="/terms">Terms of Service</Link>
+              <Link to="/safety-guidelines">Safety Guidelines</Link>
+              <Link to="/contact">Contact</Link>
             </div>
           </div>
           <div className="h-footer-bottom">
             <p className="h-footer-copy">© 2025 Matchera. Built with ❤️ for meaningful connections.</p>
             <div className="h-footer-socials">
-              <a href="#" className="h-footer-social">𝕏</a>
-              <a href="#" className="h-footer-social">in</a>
-              <a href="#" className="h-footer-social">ig</a>
+              <a href="https://twitter.com/matchera_in" target="_blank" rel="noreferrer" className="h-footer-social">𝕏</a>
+              <a href="https://linkedin.com/company/matchera" target="_blank" rel="noreferrer" className="h-footer-social">in</a>
+              <a href="https://instagram.com/matchera.in" target="_blank" rel="noreferrer" className="h-footer-social">ig</a>
             </div>
           </div>
         </div>

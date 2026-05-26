@@ -16,6 +16,16 @@ import Safety from "./pages/Safety";
 import Admin from "./pages/Admin";
 import Settings from "./pages/Settings";
 
+// Static / Info pages
+import About from "./pages/About";
+import Blog from "./pages/Blog";
+import Careers from "./pages/Careers";
+import Press from "./pages/Press";
+import Contact from "./pages/Contact";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import SafetyGuidelines from "./pages/SafetyGuidelines";
+
 // Protected route wrapper
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -28,12 +38,11 @@ function ProtectedRoute({ children }) {
 function PublicRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return null;
-  if (user) return <Navigate to="/explore" replace />;  // keep login/register redirect
+  if (user) return <Navigate to="/explore" replace />;
   return children;
 }
 
 function AppRoutes() {
-  const { user } = useAuth();
   return (
     <>
       <Navbar />
@@ -44,6 +53,16 @@ function AppRoutes() {
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
 
+        {/* Static / Info Pages (public) */}
+        <Route path="/about" element={<About />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/press" element={<Press />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/safety-guidelines" element={<SafetyGuidelines />} />
+
         {/* Protected */}
         <Route path="/explore" element={<ProtectedRoute><Explore /></ProtectedRoute>} />
         <Route path="/sessions" element={<ProtectedRoute><Sessions /></ProtectedRoute>} />
@@ -52,7 +71,6 @@ function AppRoutes() {
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/safety" element={<ProtectedRoute><Safety /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/my-sessions" element={<ProtectedRoute><Sessions /></ProtectedRoute>} />
 
