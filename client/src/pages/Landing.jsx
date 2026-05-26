@@ -209,7 +209,7 @@ export default function Landing() {
           <div className="footer-brand">
             <span className="logo-icon">💫</span>
             <span className="logo-text gradient-text" style={{ fontFamily: "var(--font-display)", fontWeight: 800 }}>
-              <img src="/matchera-logo.jpeg" alt="Matchera" style={{ height: 32 }} />
+              <img src="/matchera-logo.png" alt="Matchera" style={{ height: 32 }} />
             </span>
           </div>
           <p className="footer-copy">© 2025 Matchera. Built with ❤️ for meaningful connections.</p>

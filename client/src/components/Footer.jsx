@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="site-footer-inner">
         <div className="site-footer-top">
           <div className="site-footer-brand">
-            <img src="/matchera-logo.jpeg" alt="Matchera" className="site-footer-logo" />
+            <img src="/matchera-logo.png" alt="Matchera" className="site-footer-logo" />
             <p>India's #1 intent-based companion platform. Find partners for every moment of life — safely and meaningfully.</p>
           </div>
           <div className="site-footer-col">

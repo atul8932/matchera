@@ -27,10 +27,13 @@
 }
 
 .site-footer-logo {
-  height: 36px;
+  height: 40px;
   width: auto;
   object-fit: contain;
-  filter: brightness(1.1);
+  background: #ffffff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  display: block;
 }
 
 .site-footer-brand p {

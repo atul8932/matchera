@@ -39,7 +39,7 @@ export default function Login() {
       <div className="auth-container animate-scale-in">
         <Link to="/" className="auth-logo">
           <span>💫</span>
-          <img src="/matchera-logo.jpeg" alt="Matchera" style={{ height: 40 }} />
+          <img src="/matchera-logo.png" alt="Matchera" style={{ height: 40, mixBlendMode: "multiply" }} />
         </Link>
 
         <div className="auth-card glass">

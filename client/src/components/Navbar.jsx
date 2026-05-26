@@ -31,7 +31,7 @@ export default function Navbar() {
         <div className="navbar-inner">
           <Link to="/" className="navbar-logo">
             <span className="logo-icon">💫</span>
-            <img src="/matchera-logo.jpeg" alt="Matchera" className="logo-img" />
+            <img src="/matchera-logo.png" alt="Matchera" className="logo-img" style={{ mixBlendMode: "multiply" }} />
           </Link>
           <div className="navbar-actions">
             <Link to="/login" className="btn btn-ghost btn-sm">Sign In</Link>
@@ -47,7 +47,7 @@ export default function Navbar() {
       <div className="navbar-inner">
         <Link to="/" className="navbar-logo">
           <span className="logo-icon">💫</span>
-          <img src="/matchera-logo.jpeg" alt="Matchera" className="logo-img" />
+          <img src="/matchera-logo.png" alt="Matchera" className="logo-img" style={{ mixBlendMode: "multiply" }} />
         </Link>
 
         {/* Desktop Nav */}

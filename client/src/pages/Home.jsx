@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { INTENT_CONFIG } from "../utils/constants";
 import "./Home.css";
 
@@ -96,6 +97,7 @@ const tickerItems = [
 ];
 
 export default function Home() {
+  const { user } = useAuth();
   return (
     <div className="home">
       {/* ── HERO ─────────────────────────────────────────────────────── */}
@@ -122,12 +124,20 @@ export default function Home() {
           </p>
 
           <div className="h-hero-cta h-fade-up h-d4">
-            <Link to="/register" className="h-btn-primary">
-              🚀 Start for Free
-            </Link>
-            <Link to="/login" className="h-btn-outline">
-              Sign In →
-            </Link>
+            {!user && (
+              <Link to="/register" className="h-btn-primary">
+                🚀 Start for Free
+              </Link>
+            )}
+            {user ? (
+              <Link to="/explore" className="h-btn-primary">
+                ✨ Continue Exploring →
+              </Link>
+            ) : (
+              <Link to="/login" className="h-btn-outline">
+                Sign In →
+              </Link>
+            )}
           </div>
 
           <div className="h-pills h-fade-up h-d5">
@@ -313,8 +323,14 @@ export default function Home() {
           </h2>
           <p>Join 50,000+ people across India already using Matchera to find meaningful, purposeful connections.</p>
           <div className="h-cta-btns">
-            <Link to="/register" className="h-btn-primary">✨ Create Free Account</Link>
-            <Link to="/login"    className="h-btn-outline">I Have an Account →</Link>
+            {user ? (
+              <Link to="/explore" className="h-btn-primary">✨ Continue Exploring</Link>
+            ) : (
+              <>
+                <Link to="/register" className="h-btn-primary">✨ Create Free Account</Link>
+                <Link to="/login" className="h-btn-outline">I Have an Account →</Link>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -324,7 +340,7 @@ export default function Home() {
         <div className="h-footer-inner">
           <div className="h-footer-top">
             <div className="h-footer-brand">
-              <img src="/matchera-logo.jpeg" alt="Matchera" />
+              <img src="/matchera-logo.png" alt="Matchera" style={{ mixBlendMode: "multiply" }} />
               <p>India's #1 intent-based companion platform. Find partners for every moment of life — safely and meaningfully.</p>
             </div>
             <div className="h-footer-col">
