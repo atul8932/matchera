@@ -38,28 +38,42 @@ const JWT_SECRET = process.env.JWT_SECRET;
 app.use(helmet());
 
 // ── CORS ────────────────────────────────────────────────────────────────────
+// Support comma-separated CLIENT_URL list e.g. "https://matchera.vercel.app,https://matchera.com"
+const clientUrls = (process.env.CLIENT_URL || "")
+  .split(",")
+  .map((u) => u.trim())
+  .filter(Boolean);
+
 const allowedOrigins = [
-  process.env.CLIENT_URL,
+  ...clientUrls,
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
   "http://localhost:3000",
-].filter(Boolean);
+];
 
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl in dev)
+    // Allow requests with no origin (mobile apps, curl)
     if (!origin) return callback(null, true);
+
     const isAllowed =
       allowedOrigins.includes(origin) ||
+      // Allow all Vercel preview deployments (*.vercel.app)
+      /^https:\/\/[\w-]+\.vercel\.app$/.test(origin) ||
+      // Allow localhost in development
       (process.env.NODE_ENV !== "production" && /^http:\/\/localhost:\d+$/.test(origin));
+
     if (isAllowed) {
       callback(null, true);
     } else {
-      callback(new Error(`CORS blocked: ${origin}`));
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 // ── Rate Limiting ───────────────────────────────────────────────────────────
