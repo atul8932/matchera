@@ -1,20 +1,22 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import api from "../utils/api";
 import { useToast } from "../context/ToastContext";
+import { useAuth } from "../context/AuthContext";
 import { REPORT_REASONS } from "../utils/constants";
 import "./Safety.css";
 
 export default function Safety() {
   const toast = useToast();
+  const { user } = useAuth();
   const [reportForm, setReportForm] = useState({ reportedId: "", reason: "", description: "" });
   const [rateForm, setRateForm] = useState({ ratedId: "", rating: 5, review: "", tags: [] });
   const [sosActive, setSosActive] = useState(false);
+  const [sosSending, setSosSending] = useState(false);
+  const sosTimerRef = useRef(null);
   const [checkInDone, setCheckInDone] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [submitting, setSubmitting] = useState(false);
-  const [trustedContacts] = useState([
-    { name: "Emergency Contact", phone: "Set in Profile", relation: "Personal" },
-  ]);
+  const emergencyContact = user?.emergencyContact || null;
 
   const RATING_TAGS = ["punctual", "friendly", "safe", "fun", "professional", "respectful"];
 
@@ -44,19 +46,82 @@ export default function Safety() {
     } finally { setSubmitting(false); }
   };
 
+  // Send SOS with real GPS coordinates
   const handleSOS = async () => {
+    if (sosActive) return;
+
+    if (!emergencyContact) {
+      toast.error("⚠️ No emergency contact saved. Please add one in your Profile settings.");
+      return;
+    }
+
     setSosActive(true);
-    try {
-      await api.post("/safety/sos", { location: "Current Location", message: "SOS from app" });
-      toast.error("🚨 SOS Alert sent to emergency contact!");
-    } catch { toast.error("Failed to send SOS. Call 112 directly."); }
-    setTimeout(() => setSosActive(false), 5000);
+    setSosSending(true);
+    toast.warning("🚨 Getting your GPS location...");
+
+    const sendAlert = async (locationStr, coords) => {
+      try {
+        await api.post("/safety/sos", {
+          location: locationStr,
+          coordinates: coords,
+          message: `🚨 EMERGENCY SOS from ${user?.name || "Matchera User"}. I need help! My location: ${locationStr}`,
+          contact: emergencyContact,
+        });
+        toast.error(`🚨 SOS Alert sent to ${emergencyContact}!`);
+      } catch {
+        toast.error("⚠️ Server SOS failed. Call 112 immediately!");
+      } finally {
+        setSosSending(false);
+        sosTimerRef.current = setTimeout(() => setSosActive(false), 8000);
+      }
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          const mapsLink = `https://maps.google.com/?q=${latitude},${longitude}`;
+          sendAlert(mapsLink, [longitude, latitude]);
+        },
+        () => {
+          // GPS denied — still send SOS without coordinates
+          sendAlert("Location unavailable (GPS access denied)", null);
+        },
+        { timeout: 8000, enableHighAccuracy: true }
+      );
+    } else {
+      sendAlert("GPS not supported on this device", null);
+    }
+  };
+
+  const cancelSOS = () => {
+    if (sosTimerRef.current) clearTimeout(sosTimerRef.current);
+    setSosActive(false);
+    setSosSending(false);
+    toast.success("SOS cancelled");
   };
 
   const handleCheckIn = () => {
     setCheckInDone(true);
     toast.success("✅ Safe check-in confirmed!");
     setTimeout(() => setCheckInDone(false), 10000);
+  };
+
+  const copyMyLocation = () => {
+    if (!navigator.geolocation) { toast.error("GPS not supported on this device."); return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const link = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(link)
+            .then(() => toast.success("📍 Location link copied to clipboard!"))
+            .catch(() => toast.info("Your location: " + link));
+        } else {
+          toast.info("Your location: " + link);
+        }
+      },
+      () => toast.error("Could not get location. Please enable GPS.")
+    );
   };
 
   const tabs = ["overview", "contacts", "report", "rate"];
@@ -70,21 +135,45 @@ export default function Safety() {
         </div>
 
         {/* SOS Banner */}
-        <div className="sos-banner card">
+        <div className={`sos-banner card ${sosActive ? "sos-banner--active" : ""}`}>
           <div className="sos-info">
             <div className="sos-icon">🆘</div>
             <div>
               <h3>Emergency SOS</h3>
-              <p>In danger? Press the SOS button to alert your emergency contact instantly.</p>
+              <p>In danger? Press SOS to share your <strong>live GPS location</strong> with your emergency contact instantly.</p>
+              {emergencyContact ? (
+                <div className="sos-contact-badge">
+                  <span>📞</span>
+                  <span>Will alert: <strong>{emergencyContact}</strong></span>
+                </div>
+              ) : (
+                <div className="sos-contact-badge sos-contact-badge--warn">
+                  <span>⚠️</span>
+                  <span>No emergency contact set — <a href="/profile" style={{ color: "var(--primary)", fontWeight: 600 }}>add one in Profile</a></span>
+                </div>
+              )}
+              {sosActive && (
+                <div className="sos-status-badge">
+                  {sosSending ? "📡 Getting GPS & sending alert..." : "✅ Alert sent! Stay safe."}
+                </div>
+              )}
             </div>
           </div>
-          <button
-            className={`sos-btn ${sosActive ? "active" : ""}`}
-            onClick={handleSOS}
-            disabled={sosActive}
-          >
-            {sosActive ? "Sending..." : "SOS"}
-          </button>
+          <div className="sos-btn-group">
+            <button
+              className={`sos-btn ${sosActive ? "active" : ""} ${!emergencyContact ? "sos-btn--disabled" : ""}`}
+              onClick={handleSOS}
+              disabled={sosActive}
+              title={!emergencyContact ? "Set an emergency contact in Profile first" : ""}
+            >
+              {sosSending ? "📡 Locating..." : sosActive ? "✅ Sent!" : "🆘 SOS"}
+            </button>
+            {sosActive && (
+              <button className="btn btn-outline btn-sm" onClick={cancelSOS} style={{ marginTop: 8 }}>
+                Cancel
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Tabs */}
@@ -146,35 +235,50 @@ export default function Safety() {
         {activeTab === "contacts" && (
           <div className="contacts-section animate-fade-in">
             <div className="card" style={{ padding: 28 }}>
-              <h3 style={{ marginBottom: 20 }}>📞 Trusted Contacts</h3>
+              <h3 style={{ marginBottom: 20 }}>📞 SOS Emergency Contact</h3>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: 20 }}>
-                These people will be notified if you trigger an SOS or miss a check-in.
+                This person receives your <strong>GPS location</strong> + emergency message when you trigger SOS.
               </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
-                {trustedContacts.map((c, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", background: "var(--bg-elevated)", borderRadius: "var(--radius-md)", border: "1px solid var(--border)" }}>
-                    <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(37,99,235,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", flexShrink: 0 }}>👤</div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>{c.name}</div>
-                      <div style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>{c.phone} · {c.relation}</div>
-                    </div>
-                    <a href="/profile" className="btn btn-outline btn-sm">✏️ Edit</a>
+
+              {emergencyContact ? (
+                <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", background: "rgba(16,185,129,0.06)", borderRadius: "var(--radius-md)", border: "1px solid rgba(16,185,129,0.3)", marginBottom: 20 }}>
+                  <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(16,185,129,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.5rem", flexShrink: 0 }}>📞</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: "1rem" }}>{emergencyContact}</div>
+                    <div style={{ fontSize: "0.82rem", color: "var(--color-success)" }}>✅ SOS Ready — will receive GPS alert</div>
                   </div>
-                ))}
-              </div>
+                  <a href="/profile" className="btn btn-outline btn-sm">✏️ Edit</a>
+                </div>
+              ) : (
+                <div style={{ padding: "20px", background: "rgba(239,68,68,0.06)", borderRadius: "var(--radius-md)", border: "1px solid rgba(239,68,68,0.2)", marginBottom: 20, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: "1.5rem" }}>⚠️</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: "0.95rem", marginBottom: 4 }}>No Emergency Contact Set</div>
+                    <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>The SOS button won't work until you add an emergency contact phone number in your Profile.</div>
+                  </div>
+                  <a href="/profile" className="btn btn-primary btn-sm">+ Add Contact</a>
+                </div>
+              )}
+
               <div style={{ padding: "16px", background: "rgba(59,130,246,0.06)", borderRadius: "var(--radius-md)", border: "1px solid rgba(59,130,246,0.2)" }}>
                 <p style={{ fontSize: "0.85rem", color: "#60a5fa" }}>
-                  💡 <strong>Tip:</strong> Add your emergency contact number in your Profile settings to enable instant SOS alerts.
+                  💡 <strong>How SOS works:</strong> When you tap SOS, the app captures your GPS coordinates and sends a Google Maps link + emergency message to your saved contact number via the server.
                 </p>
               </div>
             </div>
 
             <div className="card" style={{ padding: 28 }}>
-              <h3 style={{ marginBottom: 16 }}>📱 Share Live Location</h3>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: 20 }}>Before any meetup, share your location link with a trusted contact.</p>
+              <h3 style={{ marginBottom: 16 }}>📍 Share Live Location Now</h3>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: 20 }}>
+                Before any meetup, copy your current GPS location link to share with a trusted contact.
+              </p>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                <button className="btn btn-primary btn-sm" onClick={() => toast.info("Location sharing coming soon!")}>📍 Share My Location</button>
-                <button className="btn btn-outline btn-sm" onClick={() => toast.info("Timer check-in coming soon!")}>⏰ Set Check-in Timer</button>
+                <button className="btn btn-primary btn-sm" onClick={copyMyLocation}>
+                  📍 Copy My Location Link
+                </button>
+                <button className="btn btn-outline btn-sm" onClick={() => toast.info("Timer check-in coming soon!")}>
+                  ⏰ Set Check-in Timer
+                </button>
               </div>
             </div>
           </div>

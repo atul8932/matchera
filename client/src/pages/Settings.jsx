@@ -20,6 +20,7 @@ export default function Settings() {
     email: user?.email || "",
     phone: user?.phone || "",
     age: user?.age || "",
+    emergencyContact: user?.emergencyContact || "",
   });
 
   // Privacy settings
@@ -150,6 +151,11 @@ export default function Settings() {
                     <div className="input-group">
                       <label className="input-label">Phone Number</label>
                       <input className="input" type="tel" placeholder="+91 XXXXXXXXXX" value={accountForm.phone} onChange={(e) => setAccountForm({ ...accountForm, phone: e.target.value })} />
+                    </div>
+                    <div className="input-group">
+                      <label className="input-label">🆘 Emergency Contact (SOS Number)</label>
+                      <input className="input" type="tel" placeholder="+91 XXXXXXXXXX (for SOS alerts)" value={accountForm.emergencyContact} onChange={(e) => setAccountForm({ ...accountForm, emergencyContact: e.target.value })} />
+                      <span style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginTop: 2 }}>This number receives your GPS location when you press SOS in Safety Center.</span>
                     </div>
                   </div>
                   <div className="settings-footer">

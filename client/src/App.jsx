@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
 
@@ -43,10 +43,15 @@ function PublicRoute({ children }) {
   return children;
 }
 
+const AUTH_ROUTES = ["/login", "/register"];
+
 function AppRoutes() {
+  const location = useLocation();
+  const isAuthPage = AUTH_ROUTES.includes(location.pathname);
+
   return (
     <>
-      <Navbar />
+      {!isAuthPage && <Navbar />}
       <Routes>
         {/* Public */}
         <Route path="/" element={<Home />} />
@@ -79,7 +84,7 @@ function AppRoutes() {
         <Route path="/dashboard" element={<Navigate to="/explore" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-      <Footer />
+      {!isAuthPage && <Footer />}
     </>
   );
 }

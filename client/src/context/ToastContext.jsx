@@ -15,6 +15,7 @@ export function ToastProvider({ children }) {
     success: (msg) => addToast(msg, "success"),
     error: (msg) => addToast(msg, "error"),
     info: (msg) => addToast(msg, "info"),
+    warning: (msg) => addToast(msg, "warning"),
   };
 
   return (
@@ -23,7 +24,7 @@ export function ToastProvider({ children }) {
       <div className="toast-container">
         {toasts.map((t) => (
           <div key={t.id} className={`toast toast-${t.type}`}>
-            <span>{t.type === "success" ? "✅" : t.type === "error" ? "❌" : "ℹ️"}</span>
+            <span>{t.type === "success" ? "✅" : t.type === "error" ? "❌" : t.type === "warning" ? "⚠️" : "ℹ️"}</span>
             {t.message}
           </div>
         ))}

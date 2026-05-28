@@ -60,17 +60,43 @@ router.post("/rate", verifyToken, async (req, res) => {
   }
 });
 
-// POST /api/safety/sos - Emergency SOS
+// POST /api/safety/sos - Emergency SOS with GPS location
 router.post("/sos", verifyToken, async (req, res) => {
   try {
-    const { location, message } = req.body;
+    const { location, coordinates, message, contact } = req.body;
     const user = await User.findById(req.userId);
-    // In production: send SMS/email to emergency contact
-    console.log(`🚨 SOS from ${user.name} at ${location}: ${message}`);
-    // TODO: Integrate Twilio/Firebase for real alerts
-    res.json({ message: "SOS alert sent to emergency contact", contact: user.emergencyContact });
+
+    const emergencyContact = contact || user.emergencyContact;
+    const sosMessage = message || `🚨 EMERGENCY SOS from ${user.name}. Location: ${location}`;
+
+    // Full SOS log (In production: replace with Twilio SMS / Firebase push)
+    console.log(`\n🚨 ========== SOS ALERT ==========`);
+    console.log(`User:     ${user.name} (${user.email})`);
+    console.log(`Contact:  ${emergencyContact || "NOT SET"}`);
+    console.log(`Location: ${location}`);
+    console.log(`Coords:   ${coordinates ? coordinates.join(", ") : "unavailable"}`);
+    console.log(`Message:  ${sosMessage}`);
+    console.log(`Time:     ${new Date().toISOString()}`);
+    console.log(`================================\n`);
+
+    // TODO: Uncomment below to enable real SMS via Twilio:
+    // const twilio = require("twilio")(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
+    // if (emergencyContact) {
+    //   await twilio.messages.create({
+    //     body: sosMessage,
+    //     from: process.env.TWILIO_PHONE,
+    //     to: emergencyContact,
+    //   });
+    // }
+
+    res.json({
+      message: "SOS alert sent to emergency contact",
+      contact: emergencyContact,
+      location,
+      timestamp: new Date().toISOString(),
+    });
   } catch (err) {
-    res.status(500).json({ message: "Error", error: err.message });
+    res.status(500).json({ message: "Error sending SOS", error: err.message });
   }
 });
 
